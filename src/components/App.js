@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import Result from './Result';
 
 function App() {
 
 	// Hooks de estado
 	// --- Setup inicial (quando montado)
+	const [hasSearched, setHasSearched] = useState(false);
 	const [errorSetup, setErrorSetup] = useState(false);
 	const [pokeList, setPokeList] = useState(undefined);
 	const [typeList, setTypeList] = useState(undefined);
@@ -20,7 +22,11 @@ function App() {
 	const [typeSecondaryList, setTypeSecondaryList] = useState(undefined);
 	const [typePrimaryReady, setTypePrimaryReady] = useState(false);
 	const [typeSecondaryReady, setTypeSecondaryReady] = useState(false);
+	// --- Fetch individual de pokémons
+	const [listLength, setListLength] = useState(0);
 	const [results, setResults] = useState([]);
+	const [orderedResults, setOrderedResults] = useState([]);
+	const [ordering, setOrdering] = useState(false);
 
 	// Hooks de efeito
 	// --- Ao montar
@@ -42,10 +48,11 @@ function App() {
 				response.json()
 					.then(data => {
 						if (data.results === undefined || data.results.length <= 0) setErrorSetup(true);
+						console.log(data.results);
 						setPokeList(data.results);
 					});
 			});
-		fetch('https://pokeapi.co/api/v2/type/fire')
+		fetch('https://pokeapi.co/api/v2/pokemon-species/darmanitan')
 			.then(response => response.json())
 			.then(data => console.log(data));
 	}, []);
@@ -53,6 +60,7 @@ function App() {
 	useEffect(() => {
 		// --- Somente quando a busca estiver pronta
 		if ((searching && typePrimaryReady && typeSecondaryReady) === false) return;
+		if (ordering === true) return;
 		// --- Array de resultados, populado de acordo com os tipos buscados
 		let list = [];
 		if (typePrimaryList === undefined) {
@@ -108,17 +116,42 @@ function App() {
 			}
 			return true;
 		});
-		// --- Marcar resultados finais
-		setResults(list);
-		// --- Resetar variáveis internas de busca
-		setSearching(false);
-		setTypePrimaryList(undefined);
-		setTypePrimaryReady(false);
-		setTypeSecondaryList(undefined);
-		setTypeSecondaryReady(false);
-	});
+		setListLength(list.length);
+		setResults([]);
+		setOrderedResults([]);
+		// --- Se não houver resultados
+		if (list.length <= 0) {
+			// --- Resetar variáveis internas de busca
+			setHasSearched(true);
+			setSearching(false);
+			setTypePrimaryList(undefined);
+			setTypePrimaryReady(false);
+			setTypeSecondaryList(undefined);
+			setTypeSecondaryReady(false);
+			setOrdering(false);
+		}
+		// --- Se houver, fazer o fetch de cada resultado individual
+		else {
+			for (let i = 0; i < list.length; i++) {
+				fetch(list[i].url)
+					.then(response => {
+						if (response.ok === false) setErrorSearch(true);
+						response.json()
+							.then(data => {
+								let newResults = results;
+								newResults.push(data);
+								// --- Quando chegar o último resultado, criar a lista ordenada por ID
+								if (newResults.length >= listLength) handleResults(newResults);
+								else setResults(newResults);
+							});
+					});
+			}
+			setOrdering(true);
+		}
+	}, [searching, typePrimaryReady, typeSecondaryReady, ordering, pokeList, fixedOrder, query, results]);
 
 	// Funções
+	// --- Iniciar busca
 	const handleSubmit = (event) => {
 		// --- Rejeitar se já houver uma pesquisa acontecendo
 		event.preventDefault();
@@ -174,6 +207,31 @@ function App() {
 						});
 				});
 		}
+	}
+	// --- Finalizar busca ordenando os resultados
+	const handleResults = (unorderedResults) => {
+		// --- Ordenar por ID (o ID usado pela PokeAPI é diferente do ID da pokédex, mas o ID real pode ser
+		// --- extraído da URL da página da espécie)
+		let list = unorderedResults;
+		list.sort((a, b) => {
+			let idA = a.species.url
+				.replace('https://pokeapi.co/api/v2/pokemon-species/', '')
+				.replace('/', '');
+			let idB = b.species.url
+				.replace('https://pokeapi.co/api/v2/pokemon-species/', '')
+				.replace('/', '');
+			return (parseInt(idA, 10) - parseInt(idB, 10));
+		});
+		setOrderedResults(list);
+		setResults([]);
+		// --- Resetar variáveis internas de busca
+		setHasSearched(true);
+		setSearching(false);
+		setTypePrimaryList(undefined);
+		setTypePrimaryReady(false);
+		setTypeSecondaryList(undefined);
+		setTypeSecondaryReady(false);
+		setOrdering(false);
 	}
 
 	// Renderizar
@@ -266,6 +324,26 @@ function App() {
 			</form>
 			}
 		</main>
+		<div className="list">
+			{errorSearch ?
+			<p className="list__error">
+				Não foi possível realizar a pesquisa. Tente novamente mais tarde :(
+			</p>
+			:
+			hasSearched && (orderedResults.length <= 0 ?
+			<p className="list__text">
+				Nenhum resultado encontrado. Quem sabe usando uma configuração diferente?
+			</p>
+			:
+			<ul className="list__results">
+				{orderedResults.map(result => { return (
+					<li className="result" key={result.name}>
+						<Result pokemon={result} />
+					</li>
+				);})}
+			</ul>
+			)}
+		</div>
 		</>
 	);
 }
