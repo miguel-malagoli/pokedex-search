@@ -23,7 +23,6 @@ function App() {
 	const [typePrimaryReady, setTypePrimaryReady] = useState(false);
 	const [typeSecondaryReady, setTypeSecondaryReady] = useState(false);
 	// --- Fetch individual de pokémons
-	const [listLength, setListLength] = useState(0);
 	const [results, setResults] = useState([]);
 	const [orderedResults, setOrderedResults] = useState([]);
 	const [ordering, setOrdering] = useState(false);
@@ -52,7 +51,7 @@ function App() {
 						setPokeList(data.results);
 					});
 			});
-		fetch('https://pokeapi.co/api/v2/pokemon-species/darmanitan')
+		fetch('https://pokeapi.co/api/v2/pokemon-species/pidgeot')
 			.then(response => response.json())
 			.then(data => console.log(data));
 	}, []);
@@ -116,7 +115,6 @@ function App() {
 			}
 			return true;
 		});
-		setListLength(list.length);
 		setResults([]);
 		setOrderedResults([]);
 		// --- Se não houver resultados
@@ -139,9 +137,16 @@ function App() {
 						response.json()
 							.then(data => {
 								let newResults = results;
-								newResults.push(data);
+								newResults.push({
+									...data, 
+									dexNumber: data.species.url
+										.replace('https://pokeapi.co/api/v2/pokemon-species/', '')
+										.replace('/', '')
+								});
 								// --- Quando chegar o último resultado, criar a lista ordenada por ID
-								if (newResults.length >= listLength) handleResults(newResults);
+								if (newResults.length >= list.length) {
+									handleResults(newResults);
+								} 
 								else setResults(newResults);
 							});
 					});
@@ -157,6 +162,7 @@ function App() {
 		event.preventDefault();
 		if (searching) return;
 		setSearching(true);
+		setErrorSearch(false);
 		// --- Listar todos os pokémon contendo o tipo primário
 		if (typePrimary === '') {
 			// --- Manter indefinido no caso de qualquer tipo
@@ -213,15 +219,7 @@ function App() {
 		// --- Ordenar por ID (o ID usado pela PokeAPI é diferente do ID da pokédex, mas o ID real pode ser
 		// --- extraído da URL da página da espécie)
 		let list = unorderedResults;
-		list.sort((a, b) => {
-			let idA = a.species.url
-				.replace('https://pokeapi.co/api/v2/pokemon-species/', '')
-				.replace('/', '');
-			let idB = b.species.url
-				.replace('https://pokeapi.co/api/v2/pokemon-species/', '')
-				.replace('/', '');
-			return (parseInt(idA, 10) - parseInt(idB, 10));
-		});
+		list.sort((a, b) => parseInt(a.dexNumber) - parseInt(b.dexNumber));
 		setOrderedResults(list);
 		setResults([]);
 		// --- Resetar variáveis internas de busca
@@ -328,6 +326,11 @@ function App() {
 			{errorSearch ?
 			<p className="list__error">
 				Não foi possível realizar a pesquisa. Tente novamente mais tarde :(
+			</p>
+			:
+			searching ?
+			<p className="list__text">
+				Pesquisando, aguarde um momento...
 			</p>
 			:
 			hasSearched && (orderedResults.length <= 0 ?
