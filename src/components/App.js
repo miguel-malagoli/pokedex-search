@@ -237,90 +237,100 @@ function App() {
 		<>
 		<main className="search">
 			<h1 className="search__title">
-				Busca Pokémon
+				Temos que Buscar!
 			</h1>
 			<span className="search__hint">
 				Digite o nome (ou parte do nome) de um pokémon e/ou selecione seus tipos
 			</span>
-			{errorSetup ?
-			<p className="search__error">
-				Não foi possível coletar as informações necessárias, tente novamente mais tarde :(
-			</p>
-			:
-			<form className="search__form" onSubmit={event => handleSubmit(event)}>
-				<input
-					className="search__input"
-					type="text"
-					placeholder="Nome do pokémon"
-					maxLength={32}
-					value={query}
-					onChange={event => setQuery(event.target.value)}
-					disabled={searching}
-				/>
-				<div className="search__typeFlex">
-					<select
-						className="search__drop"
-						value={typePrimary}
-						disabled={typeList === undefined || searching}
-						onChange={event => setTypePrimary(event.target.value)}
+			<div className="search__box">
+				<p className={'search__error' + (errorSetup ? ' search__error_visible' : '')}>
+					Não foi possível coletar as informações necessárias, tente novamente mais tarde :(
+				</p>
+				<form
+					className={'search__form' + (errorSetup ? ' search__form_hidden' : '')}
+					onSubmit={event => handleSubmit(event)}
 					>
-						{typeList === undefined ?
-							<option value={''}>Carregando...</option>
-							:
-							<>
-							<option value={''}>Qualquer Tipo</option>
-							{typeList.map((t => { return(
-								<option
-									key={t.url}
-									value={t.name}
-									disabled={t.name === typeSecondary}
-									>
-									{t.name}
-								</option>
-							);}))}
-							</>
-						}
-					</select>
-					<select
-						className="search__drop"
-						value={typeSecondary}
-						disabled={typeList === undefined || searching}
-						onChange={event => setTypeSecondary(event.target.value)}
-					>
-						{typeList === undefined ?
-							<option value={''}>Carregando...</option>
-							:
-							<>
-							<option value={''}>Qualquer Tipo</option>
-							{typeList.map((t => { return(
-								<option
-									key={t.url}
-									value={t.name}
-									disabled={t.name === typePrimary}
-									>
-									{t.name}
-								</option>
-							);}))}
-							</>
-						}
-					</select>
-				</div>
-				<input
-					className="search__check"
-					id="searchCheck"
-					type="checkbox"
-					checked={fixedOrder}
-					onChange={event => setFixedOrder(event.target.checked)}
-					disabled={searching}
-				/>
-				<label className="search__label" htmlFor="searchCheck">
-					Apenas tipos exatamente nessa ordem
-				</label>
-				<button disabled={pokeList === undefined || searching} className="search__submit" type="submit">
-					Buscar
-				</button>
-			</form>
-			}
+					<label className="search__labelAria" htmlFor="searchName">Nome</label>
+					<input
+						className="search__input"
+						id="searchName"
+						type="text"
+						placeholder="Nome do pokémon"
+						maxLength={32}
+						value={query}
+						onChange={event => setQuery(event.target.value)}
+						disabled={searching}
+					/>
+					<div className="search__typeFlex">
+						<label className="search__labelAria" htmlFor="searchType1">Tipo Primário</label>
+						<select
+							className="search__drop"
+							id="searchType1"
+							value={typePrimary}
+							disabled={typeList === undefined || searching}
+							onChange={event => setTypePrimary(event.target.value)}
+						>
+							{typeList === undefined ?
+								<option value={''}>Carregando...</option>
+								:
+								<>
+								<option value={''}>Qualquer Tipo</option>
+								{typeList.map((t => { return(
+									<option
+										key={t.url}
+										value={t.name}
+										disabled={t.name === typeSecondary}
+										>
+										{t.name}
+									</option>
+								);}))}
+								</>
+							}
+						</select>
+						<label className="search__labelAria" htmlFor="searchType2">Tipo Secundário</label>
+						<select
+							className="search__drop"
+							id="searchType2"
+							value={typeSecondary}
+							disabled={typeList === undefined || searching}
+							onChange={event => setTypeSecondary(event.target.value)}
+						>
+							{typeList === undefined ?
+								<option value={''}>Carregando...</option>
+								:
+								<>
+								<option value={''}>Qualquer Tipo</option>
+								{typeList.map((t => { return(
+									<option
+										key={t.url}
+										value={t.name}
+										disabled={t.name === typePrimary}
+										>
+										{t.name}
+									</option>
+								);}))}
+								</>
+							}
+						</select>
+					</div>
+					<div className="search__checkFlex">
+						<input
+							className="search__check"
+							id="searchCheck"
+							type="checkbox"
+							checked={fixedOrder}
+							onChange={event => setFixedOrder(event.target.checked)}
+							disabled={searching}
+						/>
+						<label className="search__label" htmlFor="searchCheck">
+							Apenas tipos nessa ordem exata
+						</label>
+					</div>
+					<button disabled={pokeList === undefined || searching} className="search__submit" type="submit">
+						Buscar!
+					</button>
+				</form>
+			</div>
 		</main>
 		<div className="list">
 			{errorSearch ?

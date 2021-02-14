@@ -1,0 +1,197 @@
+// Valores padrão
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+:root {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+    color: rgb(var(--theme-light));
+    background-color: rgb(var(--theme-color));
+    background-image: linear-gradient(45deg, rgba(var(--theme-contrast), 0.1), rgba(var(--theme-contrast), 0));
+    // Paleta de cores (RGB)
+    --theme-dark: 0, 0, 0;
+    --theme-light: 255, 255, 255;
+    --theme-color: 170, 30, 30;
+    --theme-contrast: 220, 220, 20;
+}
+body::-webkit-scrollbar {
+    width: 1rem;
+}
+body::-webkit-scrollbar-track {
+    background-color: rgb(var(--theme-light));
+}
+body::-webkit-scrollbar-thumb {
+    background-color: rgb(var(--theme-color));
+}
+body {
+    scrollbar-width: 1rem;
+    scrollbar-color: rgb(var(--theme-color)) rgb(var(--theme-light));
+}
+#root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100%;
+    align-items: center;
+    padding: 120px 12px;
+}
+li {
+    display: block;
+}
+a, a:visited {
+    text-decoration: none;
+}
+
+//-------------------------Bloco SEARCH-------------------------//
+.search {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .search__title {
+        text-transform: uppercase;
+        font-weight: 900;
+        font-size: min(48px, 8vw);
+        width: 100%;
+        text-align: center;
+        line-height: 1em;
+        margin-bottom: 0.25em;
+    }
+
+    .search__hint {
+        font-style: italic;
+        font-size: 16px;
+        color: rgb(var(--theme-light), 0.8);
+        width: 100%;
+        text-align: center;
+    }
+
+    .search__box {
+        position: relative;
+        margin-top: 32px;
+        background-color: rgb(var(--theme-dark), 0.5);
+        border-radius: 12px;
+        width: max(280px, 40vw);
+        max-width: 520px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search__error {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        left: 0;
+        width: 100%;
+        text-align: center;
+        display: none;
+
+        &.search__error_visible {
+            display: block;
+        }
+    }
+
+    .search__form {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+
+        &.search__form_hidden {
+            visibility: hidden;
+        }
+    }
+
+    .search__labelAria {
+        font-size: 0;
+        opacity: 0;
+        flex: 0 0 0;
+    }
+
+    .search__input {
+        padding: 8px;
+        border-radius: 8px;
+        border: none;
+        margin-bottom: 12px;
+        color: rgb(var(--theme-dark));
+
+        &::placeholder {
+            color: rgb(var(--theme-color), 0.6);
+        }
+    }
+
+    .search__typeFlex {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: stretch;
+        width: 100%;
+        margin-bottom: 8px;
+    }
+
+    .search__drop {
+        padding: 8px 4px;
+        border-radius: 8px;
+        border: none;
+        flex-grow: 1;
+        margin: 0 6px;
+        text-transform: capitalize;
+
+        &:first-of-type {
+            margin-left: 0;
+        }
+        &:last-of-type {
+            margin-right: 0;
+        }
+
+        & option {
+            text-transform: capitalize;
+        }
+    }
+
+    .search__checkFlex {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+    }
+
+    .search__check {
+        width: 14px;
+        height: 14px;
+        margin-right: 8px;
+        cursor: pointer;
+    }
+
+    .search__label {
+        font-size: 14px;
+        font-weight: 300;
+        cursor: pointer;
+    }
+
+    .search__submit {
+        background-color: rgb(var(--theme-contrast));
+        color: rgb(var(--theme-dark));
+        border: none;
+        padding: 8px;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: 600;
+        text-transform: uppercase;
+        width: 100%;
+        max-width: max(200px, 10vw);
+        align-self: center;
+        cursor: pointer;
+
+        &:disabled {
+            background-color: rgba(var(--theme-light), 0.25);
+            color: rgb(var(--theme-light));
+        }
+    }
+}
+
+// possiveis fontes: Orbitron, VT323
