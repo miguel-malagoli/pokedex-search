@@ -116,9 +116,9 @@ function App() {
 			return true;
 		});
 		setResults([]);
-		setOrderedResults([]);
 		// --- Se não houver resultados
 		if (list.length <= 0) {
+			setOrderedResults([]);
 			// --- Resetar variáveis internas de busca
 			setHasSearched(true);
 			setSearching(false);
@@ -189,7 +189,7 @@ function App() {
 				});
 		}
 		// --- Repetir o processo com o tipo secundário
-		if (typeSecondary === '' && typeSecondary === typePrimary) {
+		if (typeSecondary === '' || typeSecondary === typePrimary) {
 			// --- Manter indefinido no caso de qualquer tipo
 			setTypeSecondaryList(undefined);
 			setTypeSecondaryReady(true);
@@ -326,24 +326,23 @@ function App() {
 							Apenas tipos nessa ordem exata
 						</label>
 					</div>
-					<button disabled={pokeList === undefined || searching} className="search__submit" type="submit">
-						Buscar!
+					<button
+						disabled={pokeList === undefined || searching}
+						className={'search__submit' + (searching ? ' search__submit_progress' : '')}
+						type="submit"
+						>
+						{searching ? 'Buscando' : 'Buscar'}
 					</button>
 				</form>
 			</div>
 		</main>
-		<div className="list">
+		<div className={'list' + (hasSearched ? ' list_visible' : '')}>
 			{errorSearch ?
 			<p className="list__error">
 				Não foi possível realizar a pesquisa. Tente novamente mais tarde :(
 			</p>
 			:
-			searching ?
-			<p className="list__text">
-				Pesquisando, aguarde um momento...
-			</p>
-			:
-			hasSearched && (orderedResults.length <= 0 ?
+			orderedResults.length <= 0 ?
 			<p className="list__text">
 				Nenhum resultado encontrado. Quem sabe usando uma configuração diferente?
 			</p>
@@ -355,7 +354,7 @@ function App() {
 					</li>
 				);})}
 			</ul>
-			)}
+			}
 		</div>
 		</>
 	);
