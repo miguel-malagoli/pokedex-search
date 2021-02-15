@@ -189,7 +189,7 @@ function App() {
 				});
 		}
 		// --- Repetir o processo com o tipo secundário
-		if (typeSecondary === '' || typeSecondary === typePrimary) {
+		if (typeSecondary === '' || typeSecondary === typePrimary || typeSecondary === 'none') {
 			// --- Manter indefinido no caso de qualquer tipo
 			setTypeSecondaryList(undefined);
 			setTypeSecondaryReady(true);
@@ -220,6 +220,8 @@ function App() {
 		// --- extraído da URL da página da espécie)
 		let list = unorderedResults;
 		list.sort((a, b) => parseInt(a.dexNumber) - parseInt(b.dexNumber));
+		if (typeSecondary === 'none') list = list.filter(item => item.types.length < 2);
+		console.log(list);
 		setOrderedResults(list);
 		setResults([]);
 		// --- Resetar variáveis internas de busca
@@ -300,6 +302,7 @@ function App() {
 								:
 								<>
 								<option value={''}>Qualquer Tipo</option>
+								<option value={'none'}>Nenhum</option>
 								{typeList.map((t => { return(
 									<option
 										key={t.url}
